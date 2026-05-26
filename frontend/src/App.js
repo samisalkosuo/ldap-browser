@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaLock, FaUnlock, FaExclamationTriangle, FaPlus, FaTimes, FaSearch } from 'react-icons/fa';
+import { FaLock, FaExclamationTriangle, FaTimes, FaSearch } from 'react-icons/fa';
 import './App.css';
 import ConnectionForm from './components/ConnectionForm';
 import TreeBrowser from './components/TreeBrowser';
@@ -10,7 +10,7 @@ import { listConnections, deleteConnection } from './services/api';
 function App() {
   const [connections, setConnections] = useState([]);
   const [currentConnection, setCurrentConnection] = useState(null);
-  const [showConnectionForm, setShowConnectionForm] = useState(false);
+  const [showConnectionForm, setShowConnectionForm] = useState(true);
   const [selectedNode, setSelectedNode] = useState(null);
   const [showSearch, setShowSearch] = useState(false);
 
@@ -109,19 +109,15 @@ function App() {
                 </span>
               )}
               
-              <button className="btn btn-secondary" onClick={() => setShowSearch(!showSearch)}>
+              {/* <button className="btn btn-secondary" onClick={() => setShowSearch(!showSearch)}>
                 <FaSearch /> Search
-              </button>
+              </button> */}
               
               <button className="btn btn-danger" onClick={handleDisconnect}>
                 <FaTimes /> Disconnect
               </button>
             </>
-          ) : (
-            <button className="btn btn-primary" onClick={() => setShowConnectionForm(true)}>
-              <FaPlus /> New Connection
-            </button>
-          )}
+          ) : null}
         </div>
       </header>
 
@@ -161,16 +157,7 @@ function App() {
               </>
             )}
           </>
-        ) : (
-          <div className="empty-state">
-            <div className="empty-state-icon">🔌</div>
-            <h3>No Active Connection</h3>
-            <p>Create a new LDAP connection to get started</p>
-            <button className="btn btn-primary" onClick={() => setShowConnectionForm(true)}>
-              <FaPlus /> New Connection
-            </button>
-          </div>
-        )}
+        ) : null}
       </div>
     </div>
   );

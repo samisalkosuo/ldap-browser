@@ -1,18 +1,19 @@
 import React, { useState } from 'react';
 import { createConnection } from '../services/api';
 
+const defaultFormData = {
+  protocol: 'ldap',
+  host: '',
+  port: 389,
+  bind_dn: '',
+  username: '',
+  password: '',
+  base_dn: '',
+  timeout_seconds: 10
+};
+
 const ConnectionForm = ({ onConnectionCreated, onCancel }) => {
-  const [formData, setFormData] = useState({
-    name: '',
-    protocol: 'ldap',
-    host: '',
-    port: 389,
-    bind_dn: '',
-    username: '',
-    password: '',
-    base_dn: '',
-    timeout_seconds: 10
-  });
+  const [formData, setFormData] = useState(defaultFormData);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -24,13 +25,23 @@ const ConnectionForm = ({ onConnectionCreated, onCancel }) => {
     }));
   };
 
+  const handleClear = () => {
+    setFormData(defaultFormData);
+    setError('');
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
+    const payload = {
+      ...formData,
+      name: `${formData.host || 'LDAP'}:${formData.port}`
+    };
+
     try {
-      const connection = await createConnection(formData);
+      const connection = await createConnection(payload);
       onConnectionCreated(connection);
     } catch (err) {
       setError(err.response?.data?.detail || 'Failed to create connection');
@@ -46,59 +57,49 @@ const ConnectionForm = ({ onConnectionCreated, onCancel }) => {
       {error && <div className="error-message">{error}</div>}
       
       <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label>Connection Name *</label>
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-            placeholder="My LDAP Server"
-          />
-        </div>
+        <div className="form-row">
+          <div className="form-group">
+            <label>Protocol *</label>
+            <select
+              name="protocol"
+              value={formData.protocol}
+              onChange={handleChange}
+              required
+            >
+              <option value="ldap">ldap:// (Unencrypted)</option>
+              <option value="ldaps">ldaps:// (Encrypted/TLS)</option>
+            </select>
+            <small style={{ color: '#7f8c8d', fontSize: '0.85rem' }}>
+              Select ldaps:// for secure connections
+            </small>
+          </div>
 
-        <div className="form-group">
-          <label>Protocol *</label>
-          <select
-            name="protocol"
-            value={formData.protocol}
-            onChange={handleChange}
-            required
-          >
-            <option value="ldap">ldap:// (Unencrypted)</option>
-            <option value="ldaps">ldaps:// (Encrypted/TLS)</option>
-          </select>
-          <small style={{ color: '#7f8c8d', fontSize: '0.85rem' }}>
-            Select ldaps:// for secure connections
-          </small>
-        </div>
+          <div className="form-group">
+            <label>Host *</label>
+            <input
+              type="text"
+              name="host"
+              value={formData.host}
+              onChange={handleChange}
+              required
+              placeholder="ldap.example.com"
+            />
+          </div>
 
-        <div className="form-group">
-          <label>Host *</label>
-          <input
-            type="text"
-            name="host"
-            value={formData.host}
-            onChange={handleChange}
-            required
-            placeholder="ldap.example.com"
-          />
-        </div>
-
-        <div className="form-group">
-          <label>Port *</label>
-          <input
-            type="number"
-            name="port"
-            value={formData.port}
-            onChange={handleChange}
-            required
-            placeholder="389"
-          />
-          <small style={{ color: '#7f8c8d', fontSize: '0.85rem' }}>
-            Common ports: 389 (LDAP), 636 (LDAPS), 3268 (AD Global Catalog), 3269 (AD GC SSL)
-          </small>
+          <div className="form-group">
+            <label>Port *</label>
+            <input
+              type="number"
+              name="port"
+              value={formData.port}
+              onChange={handleChange}
+              required
+              placeholder="389"
+            />
+            <small style={{ color: '#7f8c8d', fontSize: '0.85rem' }}>
+              Common: 389, 636, 3268, 3269
+            </small>
+          </div>
         </div>
 
         <div className="form-group">
@@ -170,11 +171,9 @@ const ConnectionForm = ({ onConnectionCreated, onCancel }) => {
           <button type="submit" className="btn btn-primary" disabled={loading}>
             {loading ? 'Connecting...' : 'Connect'}
           </button>
-          {onCancel && (
-            <button type="button" className="btn btn-secondary" onClick={onCancel}>
-              Cancel
-            </button>
-          )}
+          <button type="button" className="btn btn-secondary" onClick={handleClear} disabled={loading}>
+            Clear
+          </button>
         </div>
       </form>
     </div>
