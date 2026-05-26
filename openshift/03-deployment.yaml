@@ -20,7 +20,7 @@ spec:
       containers:
       - name: ldap-browser
         image: docker.io/kazhar/ldap-browser:latest
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         ports:
         - containerPort: 8080
           name: http

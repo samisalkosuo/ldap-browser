@@ -47,6 +47,7 @@ function App() {
         await deleteConnection(currentConnection.connection_id);
         setCurrentConnection(null);
         setSelectedNode(null);
+        setShowConnectionForm(true);
         loadConnections();
       } catch (err) {
         console.error('Failed to disconnect:', err);
@@ -134,9 +135,9 @@ function App() {
                 </span>
               )}
               
-              {/* <button className="btn btn-secondary" onClick={() => setShowSearch(!showSearch)}>
+              <button className="btn btn-secondary" onClick={() => setShowSearch(!showSearch)}>
                 <FaSearch /> Search
-              </button> */}
+              </button>
               
               <button className="btn btn-danger" onClick={handleDisconnect}>
                 <FaTimes /> Disconnect
