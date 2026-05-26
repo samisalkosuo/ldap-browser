@@ -143,17 +143,15 @@ docker run -p 8080:8080 \
 # Login to OpenShift
 oc login
 
-# Create new project
-oc new-project ldap-browser
-
 # Update image in 03-deployment.yaml if needed
 # Example: image: your-registry.com/ldap-browser:latest
 
 # Update ConfigMap (01-configmap.yaml) and Secret (02-secret.yaml) as needed
-# ConfigMap contains: LOG_LEVEL and optional LDAP_* connection defaults
+# ConfigMap contains: LOG_LEVEL and optional LDAP_* connection defaults (including LDAP_PASSWORD)
 # Secret contains: APP_PORT, APP_AUTH_ENABLED, APP_AUTH_USERNAME, APP_AUTH_PASSWORD
+# Note: LDAP_PASSWORD in ConfigMap is for pre-filling connection form only, not for app authentication
 
-# Apply manifests (or use install.sh script)
+# Apply manifests using install.sh script
 cd openshift
 ./install.sh
 
