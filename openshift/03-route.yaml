@@ -2,6 +2,7 @@ apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
   name: ldap-browser
+  namespace: ldap-browser
   labels:
     app: ldap-browser
 spec:

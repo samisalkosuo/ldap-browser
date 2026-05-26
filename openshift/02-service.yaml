@@ -2,6 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: ldap-browser
+  namespace: ldap-browser
   labels:
     app: ldap-browser
 spec:

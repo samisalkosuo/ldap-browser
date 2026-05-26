@@ -130,40 +130,6 @@ docker run -p 8080:8080 \
 
 **Note**: All LDAP connection defaults are optional. If not set, users will need to manually enter connection details in the form.
 
-## Kubernetes Deployment
-
-### Prerequisites
-
-- Kubernetes cluster (1.19+)
-- kubectl configured
-- Container image built and pushed to registry
-
-### Deploy
-
-```bash
-# Update image in deployment.yaml to your registry
-# Example: image: your-registry.com/ldap-browser:latest
-
-# Apply manifests
-kubectl apply -f deploy/kubernetes/deployment.yaml
-kubectl apply -f deploy/kubernetes/service.yaml
-kubectl apply -f deploy/kubernetes/ingress.yaml
-
-# Check status
-kubectl get pods -l app=ldap-browser
-kubectl get svc ldap-browser
-```
-
-### Access
-
-```bash
-# Port forward for testing
-kubectl port-forward svc/ldap-browser 8080:8080
-
-# Or configure ingress with your domain
-# Edit deploy/kubernetes/ingress.yaml and set your hostname
-```
-
 ## OpenShift Deployment
 
 ### Prerequisites

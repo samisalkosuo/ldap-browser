@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ldap-browser
+  namespace: ldap-browser
   labels:
     app: ldap-browser
 spec:
@@ -16,11 +17,9 @@ spec:
     spec:
       securityContext:
         runAsNonRoot: true
-        runAsUser: 1001
-        fsGroup: 1001
       containers:
       - name: ldap-browser
-        image: ldap-browser:latest
+        image: docker.io/kazhar/ldap-browser:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
@@ -60,9 +59,7 @@ spec:
           failureThreshold: 3
         securityContext:
           allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: false
           runAsNonRoot: true
-          runAsUser: 1001
           capabilities:
             drop:
             - ALL
