@@ -9,7 +9,6 @@ class Settings(BaseSettings):
     app_auth_enabled: bool = False
     app_auth_username: str = "admin"
     app_auth_password: str = "changeme"
-    ldap_connection_timeout_seconds: int = 10
     log_level: str = "info"
     
     # LDAP connection defaults from environment

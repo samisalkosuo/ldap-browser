@@ -97,7 +97,6 @@ The application can be configured using environment variables:
 | `APP_AUTH_ENABLED` | `false` | Enable basic authentication for the web app |
 | `APP_AUTH_USERNAME` | `admin` | Username for web app authentication |
 | `APP_AUTH_PASSWORD` | `changeme` | Password for web app authentication |
-| `LDAP_CONNECTION_TIMEOUT_SECONDS` | `10` | Timeout for LDAP connections |
 | `LOG_LEVEL` | `info` | Logging level (debug, info, warning, error) |
 
 ### LDAP Connection Defaults (Optional)
