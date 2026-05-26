@@ -1,9 +1,10 @@
 import ldap
 import ssl
+import socket
 import logging
 from typing import Optional, List, Dict, Any, Tuple
 from models import (
-    SecurityMode, CertificateStatus, RootDSE, 
+    SecurityMode, CertificateStatus, RootDSE,
     AttributeType, AttributeValue, LDAPEntry, TreeNode, SearchScope
 )
 
@@ -22,6 +23,7 @@ class LDAPClient:
         self.security_mode: SecurityMode = SecurityMode.PLAIN
         self.certificate_status: CertificateStatus = CertificateStatus.NONE
         self.base_dn: Optional[str] = None
+        self.certificate_chain_pem: Optional[str] = None
         
     def connect_and_bind(self, bind_dn: str, password: str) -> Tuple[bool, Optional[str]]:
         """
@@ -52,6 +54,9 @@ class LDAPClient:
         try:
             ldap_url = f"ldaps://{self.host}:{self.port}"
             logger.info(f"Attempting LDAPS connection to {ldap_url}")
+            
+            # Capture certificate chain before LDAP connection
+            self._capture_certificate_chain()
             
             # Create TLS context that accepts all certificates
             ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_NEVER)
@@ -85,6 +90,9 @@ class LDAPClient:
         try:
             ldap_url = f"ldap://{self.host}:{self.port}"
             logger.info(f"Attempting LDAP+StartTLS connection to {ldap_url}")
+            
+            # Capture certificate chain before LDAP connection
+            self._capture_certificate_chain()
             
             # Create connection
             ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_NEVER)
@@ -462,6 +470,40 @@ class LDAPClient:
             return None
         decoded = self._decode_attr(values)
         return decoded[0] if decoded else None
+    
+    def _capture_certificate_chain(self):
+        """Capture SSL certificate chain from the server."""
+        try:
+            context = ssl.create_default_context()
+            context.check_hostname = False
+            context.verify_mode = ssl.CERT_NONE
+            
+            with socket.create_connection((self.host, self.port), timeout=self.timeout) as sock:
+                with context.wrap_socket(sock, server_hostname=self.host) as ssock:
+                    # Get the certificate in DER format
+                    der_cert = ssock.getpeercert(binary_form=True)
+                    
+                    if der_cert:
+                        # Convert DER to PEM
+                        import base64
+                        pem_cert = "-----BEGIN CERTIFICATE-----\n"
+                        pem_cert += base64.b64encode(der_cert).decode('ascii')
+                        # Split into 64-character lines
+                        pem_lines = [pem_cert[i:i+64] for i in range(len(pem_cert), len(pem_cert) + len(base64.b64encode(der_cert).decode('ascii')), 64)]
+                        pem_cert = "-----BEGIN CERTIFICATE-----\n"
+                        pem_cert += "\n".join([base64.b64encode(der_cert).decode('ascii')[i:i+64]
+                                              for i in range(0, len(base64.b64encode(der_cert).decode('ascii')), 64)])
+                        pem_cert += "\n-----END CERTIFICATE-----\n"
+                        
+                        self.certificate_chain_pem = pem_cert
+                        logger.info("Certificate chain captured successfully")
+        except Exception as e:
+            logger.warning(f"Failed to capture certificate chain: {str(e)}")
+            self.certificate_chain_pem = None
+    
+    def get_certificate_chain_pem(self) -> Optional[str]:
+        """Get the certificate chain in PEM format."""
+        return self.certificate_chain_pem
     
     def disconnect(self):
         """Close LDAP connection."""

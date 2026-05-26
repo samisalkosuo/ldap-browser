@@ -167,6 +167,23 @@ async def search_ldap(connection_id: str, request: SearchRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.get("/api/connections/{connection_id}/certificate")
+async def get_certificate_chain(connection_id: str):
+    """Get certificate chain in PEM format."""
+    client = connection_manager.get_connection(connection_id)
+    if not client:
+        raise HTTPException(status_code=404, detail="Connection not found")
+    
+    cert_pem = client.get_certificate_chain_pem()
+    if not cert_pem:
+        raise HTTPException(status_code=404, detail="No certificate available")
+    
+    return JSONResponse(
+        content={"certificate_pem": cert_pem},
+        media_type="application/json"
+    )
+
+
 @app.exception_handler(Exception)
 async def global_exception_handler(request, exc):
     """Global exception handler."""

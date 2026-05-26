@@ -54,6 +54,11 @@ export const searchLDAP = async (connectionId, searchParams) => {
   return response.data;
 };
 
+export const getCertificateChain = async (connectionId) => {
+  const response = await api.get(`/connections/${connectionId}/certificate`);
+  return response.data;
+};
+
 export default api;
 
 // Made with Bob

@@ -5,7 +5,7 @@ import ConnectionForm from './components/ConnectionForm';
 import TreeBrowser from './components/TreeBrowser';
 import AttributeViewer from './components/AttributeViewer';
 import SearchPanel from './components/SearchPanel';
-import { listConnections, deleteConnection } from './services/api';
+import { listConnections, deleteConnection, getCertificateChain } from './services/api';
 
 function App() {
   const [connections, setConnections] = useState([]);
@@ -59,10 +59,30 @@ function App() {
     setShowSearch(false);
   };
 
+  const handleViewCertificate = async (connectionId) => {
+    try {
+      const data = await getCertificateChain(connectionId);
+      if (data.certificate_pem) {
+        // Open a new window with the certificate
+        const certWindow = window.open('', '_blank');
+        if (certWindow) {
+          certWindow.document.write('<html><head><title>Certificate Chain</title></head><body>');
+          certWindow.document.write('<pre style="font-family: monospace; white-space: pre-wrap; word-wrap: break-word;">');
+          certWindow.document.write(data.certificate_pem);
+          certWindow.document.write('</pre></body></html>');
+          certWindow.document.close();
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch certificate:', err);
+      alert('Failed to retrieve certificate chain');
+    }
+  };
+
   const getSecurityBadge = (connection) => {
     if (!connection) return null;
 
-    const { security_mode, certificate_status } = connection;
+    const { security_mode, certificate_status, connection_id } = connection;
 
     if (security_mode === 'plain') {
       return (
@@ -74,9 +94,14 @@ function App() {
 
     if (certificate_status === 'self_signed' || certificate_status === 'untrusted') {
       return (
-        <span className="security-badge self-signed">
+        <button
+          className="security-badge self-signed"
+          onClick={() => handleViewCertificate(connection_id)}
+          style={{ cursor: 'pointer', border: 'none', background: 'transparent', padding: 0 }}
+          title="Click to view certificate chain"
+        >
           <FaExclamationTriangle /> Self-Signed Cert
-        </span>
+        </button>
       );
     }
 
