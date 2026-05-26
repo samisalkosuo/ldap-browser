@@ -23,6 +23,18 @@ A web-based, read-only LDAP directory browser designed for troubleshooting, expl
 
 ## Quick Start
 
+### Using Docker
+
+```bash
+# Build the image
+docker build -t ldap-browser .
+
+# Run the container
+docker run -p 8080:8080 ldap-browser
+```
+
+Access the application at http://localhost:8080
+
 ### Using Docker Compose (Recommended for Testing)
 
 The easiest way to try the LDAP Browser with a test LDAP server:
@@ -42,18 +54,6 @@ docker-compose up -d
 - Bind DN: `cn=admin,dc=example,dc=com`
 - Password: `admin`
 - Base DN: `dc=example,dc=com`
-
-### Using Docker
-
-```bash
-# Build the image
-docker build -t ldap-browser .
-
-# Run the container
-docker run -p 8080:8080 ldap-browser
-```
-
-Access the application at http://localhost:8080
 
 ## Local Development
 
