@@ -146,17 +146,28 @@ oc login
 # Create new project
 oc new-project ldap-browser
 
-# Update image in deployment.yaml
+# Update image in 03-deployment.yaml if needed
 # Example: image: your-registry.com/ldap-browser:latest
 
-# Apply manifests
-oc apply -f deploy/openshift/deployment.yaml
-oc apply -f deploy/openshift/service.yaml
-oc apply -f deploy/openshift/route.yaml
+# Update ConfigMap (01-configmap.yaml) and Secret (02-secret.yaml) as needed
+# ConfigMap contains: LOG_LEVEL and optional LDAP_* connection defaults
+# Secret contains: APP_PORT, APP_AUTH_ENABLED, APP_AUTH_USERNAME, APP_AUTH_PASSWORD
+
+# Apply manifests (or use install.sh script)
+cd openshift
+./install.sh
+
+# Or apply manually in order:
+# oc apply -f 00-namespace.yaml
+# oc apply -f 01-configmap.yaml
+# oc apply -f 02-secret.yaml
+# oc apply -f 03-deployment.yaml
+# oc apply -f 04-service.yaml
+# oc apply -f 05-route.yaml
 
 # Check status
-oc get pods
-oc get route ldap-browser
+oc get pods -n ldap-browser
+oc get route ldap-browser -n ldap-browser
 ```
 
 ### Access
