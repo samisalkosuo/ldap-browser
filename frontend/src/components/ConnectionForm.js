@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { createConnection } from '../services/api';
+import React, { useState, useEffect } from 'react';
+import { createConnection, getConnectionDefaults } from '../services/api';
 
 const defaultFormData = {
   protocol: 'ldap',
@@ -16,6 +16,26 @@ const ConnectionForm = ({ onConnectionCreated, onCancel }) => {
   const [formData, setFormData] = useState(defaultFormData);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Fetch connection defaults from environment variables on mount
+  useEffect(() => {
+    const fetchDefaults = async () => {
+      try {
+        const defaults = await getConnectionDefaults();
+        if (Object.keys(defaults).length > 0) {
+          setFormData(prev => ({
+            ...prev,
+            ...defaults
+          }));
+        }
+      } catch (err) {
+        // Silently fail - defaults are optional
+        console.log('No connection defaults available');
+      }
+    };
+    
+    fetchDefaults();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

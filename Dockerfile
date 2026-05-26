@@ -41,6 +41,17 @@ RUN mkdir -p /tmp && chmod 777 /tmp
 # Switch to non-root user
 USER appuser
 
+# Environment variables for LDAP connection defaults
+# These can be overridden at runtime
+ENV LDAP_PROTOCOL=ldap \
+    LDAP_HOST= \
+    LDAP_PORT=389 \
+    LDAP_BIND_DN= \
+    LDAP_USERNAME= \
+    LDAP_PASSWORD= \
+    LDAP_BASE_DN= \
+    LDAP_TIMEOUT_SECONDS=10
+
 # Expose port
 EXPOSE 8080
 

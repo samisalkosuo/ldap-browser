@@ -89,14 +89,46 @@ Frontend will be available at http://localhost:3000
 
 The application can be configured using environment variables:
 
+### Application Settings
+
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `APP_PORT` | `8080` | Port the application listens on |
 | `APP_AUTH_ENABLED` | `false` | Enable basic authentication for the web app |
 | `APP_AUTH_USERNAME` | `admin` | Username for web app authentication |
-| `APP_AUTH_PASSWORD` | `change-me` | Password for web app authentication |
+| `APP_AUTH_PASSWORD` | `changeme` | Password for web app authentication |
 | `LDAP_CONNECTION_TIMEOUT_SECONDS` | `10` | Timeout for LDAP connections |
 | `LOG_LEVEL` | `info` | Logging level (debug, info, warning, error) |
+
+### LDAP Connection Defaults (Optional)
+
+These environment variables allow you to pre-fill the connection form with default values. When set, users only need to click "Connect" to establish an LDAP connection.
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `LDAP_PROTOCOL` | - | Protocol: `ldap` or `ldaps` |
+| `LDAP_HOST` | - | LDAP server hostname or IP address |
+| `LDAP_PORT` | - | LDAP server port (e.g., 389, 636, 3268, 3269) |
+| `LDAP_BIND_DN` | - | Bind DN for authentication (e.g., `cn=admin,dc=example,dc=com`) |
+| `LDAP_USERNAME` | - | Username (alternative to Bind DN, if supported by server) |
+| `LDAP_PASSWORD` | - | Password for authentication |
+| `LDAP_BASE_DN` | - | Base DN for searches (e.g., `dc=example,dc=com`) |
+| `LDAP_TIMEOUT_SECONDS` | - | Connection timeout in seconds |
+
+**Example Docker run with LDAP defaults:**
+
+```bash
+docker run -p 8080:8080 \
+  -e LDAP_PROTOCOL=ldap \
+  -e LDAP_HOST=ldap.example.com \
+  -e LDAP_PORT=389 \
+  -e LDAP_BIND_DN=cn=admin,dc=example,dc=com \
+  -e LDAP_PASSWORD=secret \
+  -e LDAP_BASE_DN=dc=example,dc=com \
+  ldap-browser
+```
+
+**Note**: All LDAP connection defaults are optional. If not set, users will need to manually enter connection details in the form.
 
 ## Kubernetes Deployment
 
@@ -183,74 +215,6 @@ docker tag ldap-browser:latest your-registry.com/ldap-browser:latest
 docker push your-registry.com/ldap-browser:latest
 ```
 
-## Usage Guide
-
-### Creating a Connection
-
-1. Click "New Connection" in the header
-2. Fill in the connection details:
-   - **Connection Name**: Friendly name for this connection
-   - **Host**: LDAP server hostname or IP
-   - **Port**: 389 (LDAP), 636 (LDAPS), 3268 (AD GC), 3269 (AD GC SSL)
-   - **Bind DN**: Full distinguished name (e.g., `cn=admin,dc=example,dc=com`)
-   - **Password**: Bind password
-   - **Base DN**: Optional, will be auto-discovered if not provided
-3. Click "Connect"
-
-The application will automatically:
-- Try LDAPS if port suggests secure connection
-- Fall back to StartTLS if available
-- Use plain LDAP as last resort
-- Display security status with visual indicators
-
-### Browsing the Tree
-
-- Click the arrow icon to expand/collapse nodes
-- Click the entry name or icon to view details
-- Tree loads children on-demand for performance
-
-### Viewing Attributes
-
-- Select an entry from the tree
-- All attributes are displayed in a sortable table
-- Sort by: Name (A-Z/Z-A), Type, or Size
-- Click "Copy" to copy attribute values to clipboard
-- Multi-value attributes show all values
-
-### Searching
-
-1. Click "Search" in the header
-2. Configure search parameters:
-   - **Base DN**: Starting point for search
-   - **Filter**: LDAP filter (e.g., `(objectClass=person)`)
-   - **Scope**: Base, One Level, or Subtree
-   - **Size Limit**: Maximum results to return
-   - **Time Limit**: Search timeout in seconds
-3. Click "Search"
-4. Click any result to view its details
-
-### Common LDAP Filters
-
-```ldap
-# All entries
-(objectClass=*)
-
-# All users
-(objectClass=person)
-
-# All groups
-(objectClass=group)
-
-# Specific user
-(cn=John Smith)
-
-# Users with email
-(mail=*)
-
-# Complex filter
-(&(objectClass=person)(mail=*@example.com))
-```
-
 ## Security Considerations
 
 ### What This Application Does
@@ -316,63 +280,9 @@ The application will automatically:
 - Check for binary attributes that may not decode
 - Review browser console for errors
 
-## Development
-
-### Project Structure
-
-```
-ldap-browser/
-├── backend/              # Python FastAPI backend
-│   ├── main.py          # FastAPI application
-│   ├── models.py        # Pydantic models
-│   ├── ldap_client.py   # LDAP client implementation
-│   ├── connection_manager.py  # Connection management
-│   ├── config.py        # Configuration
-│   └── requirements.txt # Python dependencies
-├── frontend/            # React frontend
-│   ├── public/         # Static files
-│   ├── src/
-│   │   ├── components/ # React components
-│   │   ├── services/   # API client
-│   │   ├── App.js      # Main application
-│   │   └── App.css     # Styles
-│   └── package.json    # Node dependencies
-├── deploy/             # Deployment manifests
-│   ├── kubernetes/     # Kubernetes YAML
-│   └── openshift/      # OpenShift YAML
-├── Dockerfile          # Container build
-├── docker-compose.yml  # Local development
-└── README.md          # This file
-```
-
-### Running Tests
-
-```bash
-# Backend tests (if implemented)
-cd backend
-pytest
-
-# Frontend tests
-cd frontend
-npm test
-```
-
-### Contributing
-
-Contributions are welcome! Please:
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
 ## License
 
 See LICENSE file for details.
-
-## Support
-
-For issues, questions, or contributions, please use the GitHub issue tracker.
 
 ## Acknowledgments
 

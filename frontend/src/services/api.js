@@ -10,6 +10,11 @@ const api = axios.create({
 });
 
 // Connection Management
+export const getConnectionDefaults = async () => {
+  const response = await api.get('/connection-defaults');
+  return response.data;
+};
+
 export const createConnection = async (connectionData) => {
   const response = await api.post('/connections', connectionData);
   return response.data;
