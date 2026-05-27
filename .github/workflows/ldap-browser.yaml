@@ -12,8 +12,9 @@ on:
       - '!**.adoc'
       - '!**.md'
       - '!openshift/**'
+      - '!images/**'
 jobs:
-  postgresql-lab-container-build-and-push:
+  ldap-browser-container-build-and-push:
     uses: ./.github/workflows/reusable-container-build-and-push.yaml
     with:
       imagename: kazhar/ldap-browser

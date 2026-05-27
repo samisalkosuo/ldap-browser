@@ -27,6 +27,13 @@ A web-based, read-only LDAP directory browser designed for troubleshooting, expl
 
 ### Using Docker
 
+Pull and run the Docker container:
+```bash
+docker run -p 8080:8080 docker.io/kazhar/ldap-browser:latest
+```
+
+Build and run the Docker container:
+
 ```bash
 # Build the image
 docker build -t ldap-browser .
