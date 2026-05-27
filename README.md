@@ -2,6 +2,8 @@
 
 A web-based, read-only LDAP directory browser designed for troubleshooting, exploration, and inspection of LDAP servers.
 
+<img src="images/ldap_browser_20260527.jpg" alt="LDAP Browser Screenshot" width="60%">
+
 ## Features
 
 - 🔍 **Read-Only Access** - Browse LDAP directories safely without modification capabilities
